@@ -1,7 +1,6 @@
 //--------------------------------------------------------
 //-- Library builder
 //--------------------------------------------------------
-/* eslint-disable class-methods-use-this */
 'use strict';
 
 const merge = require('lodash.merge');

@@ -1,6 +1,6 @@
 {
   "name": "@absolunet/library-builder",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "JS library builder via webpack",
   "definition": "",
   "homepage": "https://github.com/absolunet/node-library-builder",
@@ -8,6 +8,11 @@
     "name": "Absolunet",
     "url": "https://absolunet.com"
   },
+  "keywords": [
+    "babel",
+    "builder",
+    "webpack"
+  ],
   "license": "MIT",
   "repository": {
     "url": "git://github.com/absolunet/node-library-builder.git",
@@ -17,20 +22,21 @@
     "url": "https://github.com/absolunet/node-library-builder/issues"
   },
   "engines": {
-    "node": ">= 10.6.0"
+    "node": ">= 10.7.0"
   },
+  "main": "index.js",
   "scripts": {
     "test": "ava"
   },
   "devDependencies": {
-    "@absolunet/tester": "1.7.1"
+    "@absolunet/tester": "2.1.0"
   },
   "dependencies": {
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",
     "lodash.merge": "^4.6.1",
-    "webpack": "^4.16.0",
-    "webpack-cli": "^3.0.8"
+    "webpack": "^4.16.2",
+    "webpack-cli": "^3.1.0"
   }
 }

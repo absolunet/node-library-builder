@@ -25,16 +25,16 @@ Imposes some conventions to work well
 ### Project structure
 ```
 dist/
-  ↳ node.js
-  ↳ web.js
-  ↳ web-es5.js
+	↳ node.js
+	↳ web.js
+	↳ web-es5.js
 
 src/
-  ↳ index.js
-  ↳ libs/
-  ↳ wrapper/
-       ↳ node.js
-       ↳ web.js
+	↳ index.js
+	↳ libs/
+	↳ wrapper/
+		↳ node.js
+		↳ web.js
 ```
 
 - Each build will be outputted in a `dist` folder with a predefined name.
