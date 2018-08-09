@@ -2,8 +2,8 @@
 
 'use strict';
 
-const crossSpawn = require('cross-spawn');
+const spawn = require('cross-spawn');
 
 
 const bin = require.resolve('webpack-cli');
-crossSpawn(bin, { stdio:'inherit' });
+spawn(bin, { stdio:'inherit' });
