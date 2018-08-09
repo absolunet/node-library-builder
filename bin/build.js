@@ -2,8 +2,8 @@
 
 'use strict';
 
-const { execSync } = require('child_process');
+const crossSpawn = require('cross-spawn');
 
 
 const bin = require.resolve('webpack-cli');
-execSync(bin, { stdio:'inherit' });
+crossSpawn(bin, { stdio:'inherit' });
