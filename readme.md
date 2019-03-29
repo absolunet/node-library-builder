@@ -4,11 +4,11 @@
 [![npm dependencies](https://david-dm.org/absolunet/node-library-builder/status.svg)](https://david-dm.org/absolunet/node-library-builder)
 [![npms](https://badges.npms.io/%40absolunet%2Flibrary-builder.svg)](https://npms.io/search?q=%40absolunet%2Flibrary-builder)
 [![Travis CI](https://api.travis-ci.org/absolunet/node-library-builder.svg?branch=master)](https://travis-ci.org/absolunet/node-library-builder/builds)
-[![Code style ESLint](https://img.shields.io/badge/code_style-@absolunet/node-659d32.svg)](https://github.com/absolunet/eslint-config-node)
+[![Code style ESLint](https://img.shields.io/badge/code_style-@absolunet/node-659d32.svg)](https://github.com/absolunet/eslint-config)
 
 > JS library builder via webpack
 
-Write your JS library and export it for Node.js, web (ES5/ES6) via [webpack](https://webpack.js.org) and [Babel](https://babeljs.io/)
+Write your JS library and export it for Node.js, browser (ES5/ES6+) via [webpack](https://webpack.js.org) and [Babel](https://babeljs.io/)
 
 
 ## Install
@@ -24,35 +24,36 @@ Imposes some conventions to work well
 
 ### Project structure
 ```
-dist/
-	↳ node.js
-	↳ web.js
-	↳ web-es5.js
+index.js
 
-src/
-	↳ index.js
-	↳ libs/
-	↳ wrapper/
-		↳ node.js
-		↳ web.js
+dist/
+	↳ browser.js
+	↳ browser-es5.js
+	↳ node.js
+
+export/
+	↳ browser.js
+	↳ node.js
+
+lib/
 ```
 
 - Each build will be outputted in a `dist` folder with a predefined name.
-- Entry points for the builds are under a `src/wrapper` folder with predefined names.
-- *Ideally* the main script would be under `src/index.js` with its subfiles under `src/libs`.
+- Entry points for the builds are under a `export` folder with predefined names.
+- *Ideally* the main script would be under `index.js` with its subfiles under `lib`.
 
 
 ### Code conventions
 - Internal dependencies (which will be outputted in the final built file) are dealt with the `ES6 modules (import / export)` syntax.
 - External dependencies (which will be referenced in the final built file) are dealt with the `Node.js modules (require)` syntax.
-- `src/index.js` should end with an `export default` statement representing the whole library.
+- `index.js` should end with a named `export` statement representing the whole library.
 
 
 ### Node.js build
 - External dependencies will be left untouched in the final built file thus making classic `require()` Node.js statements. *(See webpack configuration)*
-- The `src/wrapper/node.js` file should look like this:
+- The `export/node.js` file should look like this:
 ```js
-export { default as mylibrary } from '../index.js';
+export * from '..';
 ```
 - Making its final usage look like
 ```js
@@ -60,23 +61,23 @@ const { mylibrary } = require('@organisation/my-library');   // dist/node.js
 ```
 
 
-### Web build
+### Browser build
 - External dependencies will be transform to a variable assignation, assuming that the dependencies are already loaded elsewhere. *(See webpack configuration)*
 ```js
 const cl = require('cool-lib');
 // Becomes
 const cl = coolLib;
 ```
-- The `src/wrapper/web.js` file should look like this:
+- The `export/browser.js` file should look like this:
 ```js
-import all from '../index.js';
-window.mylibrary = all;
+import { mylibrary } from '..';
+window.mylibrary = mylibrary;
 ```
 - Making its final usage look like
 ```js
 console.log(window.mylibrary);
 ```
-- The `dist/web.js` is a pure built and the `dist/web-es5.js` is the same but with a Babel compilation to ES5 syntax.
+- The `dist/browser.js` is a pure ES6+ built and the `dist/browser-es5.js` is the same but with a Babel compilation to ES5 syntax.
 
 
 ### webpack Configuration
@@ -97,19 +98,19 @@ const nodeConfig = merge({}, libraryBuilder.config.node, {
 });
 
 
-//-- Web
-const webExternals = {
+//-- Browser
+const browserExternals = {
 	externals: {
 		'cool-lib':           'coolLib',   // Dependencies to reference and their variable counterpart
 		'meaningful-helper':  'mnfHelper'
 	}
 };
 
-const webConfig    = merge({}, libraryBuilder.config.web,    webExternals);
-const webES5Config = merge({}, libraryBuilder.config.webES5, webExternals);
+const browserConfig    = merge({}, libraryBuilder.config.browser,    browserExternals);
+const browserES5Config = merge({}, libraryBuilder.config.browserES5, browserExternals);
 
 
-module.exports = [nodeConfig, webConfig, webES5Config];
+module.exports = [nodeConfig, browserConfig, browserES5Config];
 ```
 
 
@@ -118,6 +119,7 @@ Your `package.json` should contain these entries
 ```json
 {
 	"main": "dist/node.js",
+	"browser": "dist/browser.js",
 	"scripts": {
 		"build": "node node_modules/@absolunet/library-builder/bin/build.js"
 	},
@@ -164,16 +166,16 @@ Base webpack config for Node.js export
 
 <br>
 
-### `config.web`
-Base webpack config for web ES6 export
+### `config.browser`
+Base webpack config for browser ES6+ export
 
 
 
 
 <br>
 
-### `config.webES5`
-Base webpack config for web ES5 export (via Babel)
+### `config.browserES5`
+Base webpack config for browser ES5 export (via Babel)
 
 
 

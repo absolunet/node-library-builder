@@ -24,7 +24,7 @@ const mergeDist = (config) => {
 
 //-- Common
 const commonConfig = {
-	mode: 'none',
+	mode:    'none',
 	devtool: ''
 };
 
@@ -32,34 +32,34 @@ const commonConfig = {
 //-- Node.js
 const nodeConfig = merge({}, commonConfig, {
 	target: 'node',
-	entry:  './src/wrapper/node.js',
+	entry:  './export/node.js',
 	output: {
-		filename: 'node.js',
+		filename:      'node.js',
 		libraryTarget: 'commonjs2'
 	}
 });
 
 
-//-- Web
-const webConfig = merge({}, commonConfig, {
+//-- Browser
+const browserConfig = merge({}, commonConfig, {
 	target: 'web',
-	entry:  './src/wrapper/web.js',
+	entry:  './export/browser.js',
 	output: {
-		filename: 'web.js'
+		filename: 'browser.js'
 	}
 });
 
 
-//-- Web ES5
-const webES5Config = merge({}, webConfig, {
+//-- Browser ES5
+const browserES5Config = merge({}, browserConfig, {
 	output: {
-		filename: 'web-es5.js'
+		filename: 'browser-es5.js'
 	},
 	module: {
 		rules: [
 			{
-				test: /\.js$/,
-				exclude: /(node_modules|bower_components)/,
+				test: /\.js$/u,
+				exclude: /node_modules/u,
 				use: {
 					loader: 'babel-loader',
 					options: {
@@ -84,12 +84,12 @@ class BuilderConfig {
 		return mergeDist(nodeConfig);
 	}
 
-	get web() {
-		return mergeDist(webConfig);
+	get browser() {
+		return mergeDist(browserConfig);
 	}
 
-	get webES5() {
-		return mergeDist(webES5Config);
+	get browserES5() {
+		return mergeDist(browserES5Config);
 	}
 
 }

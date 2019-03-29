@@ -6,4 +6,4 @@ const spawn = require('cross-spawn');
 
 
 const bin = require.resolve('webpack-cli');
-spawn(bin, { stdio:'inherit' });
+spawn(bin, { stdio: 'inherit' });
