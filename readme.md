@@ -70,7 +70,6 @@ console.log(window.kafe.mylibrary);
 ### webpack Configuration
 Your `webpack.config.js` should look like this
 ```js
-const merge          = require('lodash.merge');
 const LibraryBuilder = require('@absolunet/library-builder');
 
 const builder = new LibraryBuilder({
@@ -80,12 +79,12 @@ const builder = new LibraryBuilder({
 
 
 //-- Node.js
-const nodeConfig = merge({}, builder.config.node, {
+const nodeExternals = {
 	externals: [
 		'cool-lib',          // Dependencies to reference and not include
 		'meaningful-helper'
 	]
-});
+};
 
 
 //-- kafe
@@ -96,11 +95,12 @@ const kafeExternals = {
 	}
 };
 
-const kafeConfig    = merge({}, builder.config.kafe,    kafeExternals);
-const kafeES5Config = merge({}, builder.config.kafeES5, kafeExternals);
 
-
-module.exports = [nodeConfig, kafeConfig, kafeES5Config];
+module.exports = [
+	builder.config.mergeWithNode(nodeExternals),
+	builder.config.mergeWithKafe(kafeExternals),
+	builder.config.mergeWithKafeES5(kafeExternals)
+];
 ```
 
 
@@ -155,21 +155,60 @@ Path to root folder  *(typically `__dirname`)*
 ## API - Configuration
 
 ### config.node
-Base webpack config for Node.js export
+Base webpack configuration for Node.js export
 
 
 
 <br>
 
 ### config.kafe
-Base webpack config for kafe ES6+ export
+Base webpack configuration for kafe ES6+ export
 
 
 
 <br>
 
 ### config.kafeES5
-Base webpack config for kafe ES5 export (via Babel)
+Base webpack configuration for kafe ES5 export (via Babel)
+
+
+
+<br>
+
+### config.mergeWithNode(config)
+Returns `Object` webpack configuration<br>
+Add custom configuration to base configuration
+
+#### config
+*Required*<br>
+Type: `Object`<br>
+webpack configuration to merge with Node.js configuration
+
+
+
+<br>
+
+### config.mergeWithKafe(config)
+Returns `Object` webpack configuration<br>
+Add custom configuration to base configuration
+
+#### config
+*Required*<br>
+Type: `Object`<br>
+webpack configuration to merge with kafe ES6+ configuration
+
+
+
+<br>
+
+### config.mergeWithKafeES5(config)
+Returns `Object` webpack configuration<br>
+Add custom configuration to base configuration
+
+#### config
+*Required*<br>
+Type: `Object`<br>
+webpack configuration to merge with kafe ES5 configuration
 
 
 
