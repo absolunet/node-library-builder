@@ -1,6 +1,6 @@
 {
   "name": "@absolunet/library-builder",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "JS library builder via webpack",
   "definition": "",
   "homepage": "https://github.com/absolunet/node-library-builder",
@@ -12,6 +12,7 @@
     "babel",
     "browser",
     "builder",
+    "kafe",
     "node",
     "webpack"
   ],
@@ -31,12 +32,16 @@
     "test": "ava test"
   },
   "devDependencies": {
-    "@absolunet/tester": "2.6.0"
+    "@absolunet/tester": "2.6.2",
+    "ow": "0.12.0"
   },
   "dependencies": {
-    "babel-core": "^6.26.3",
+    "@absolunet/fss": "^1.6.0",
+    "@absolunet/private-registry": "^2.0.0",
+    "@babel/core": "^7.4.0",
+    "@babel/preset-env": "^7.4.2",
     "babel-loader": "^8.0.5",
-    "babel-preset-env": "^1.7.0",
+    "core-js": "^3.0.0",
     "cross-spawn": "^6.0.5",
     "lodash.merge": "^4.6.1",
     "webpack": "^4.29.6",

@@ -8,7 +8,7 @@
 
 > JS library builder via webpack
 
-Write your JS library and export it for Node.js, browser (ES5/ES6+) via [webpack](https://webpack.js.org) and [Babel](https://babeljs.io/)
+Write your JS library and export it for Node.js, [kafe](https://absolunet.github.io/kafe) (ES5/ES6+) via [webpack](https://webpack.js.org) and [Babel](https://babeljs.io/)
 
 
 ## Install
@@ -25,72 +25,62 @@ Imposes some conventions to work well
 ### Project structure
 ```
 index.js
+webpack.config.js
 
 dist/
-	↳ browser.js
-	↳ browser-es5.js
-	↳ node.js
-
-export/
-	↳ browser.js
+	↳ kafe.js
+	↳ kafe-es5.js
 	↳ node.js
 
 lib/
 ```
 
 - Each build will be outputted in a `dist` folder with a predefined name.
-- Entry points for the builds are under a `export` folder with predefined names.
-- *Ideally* the main script would be under `index.js` with its subfiles under `lib`.
+- Main script would be under `index.js` with its subfiles under `lib`.
 
 
 ### Code conventions
 - Internal dependencies (which will be outputted in the final built file) are dealt with the `ES6 modules (import / export)` syntax.
 - External dependencies (which will be referenced in the final built file) are dealt with the `Node.js modules (require)` syntax.
-- `index.js` should end with a named `export` statement representing the whole library.
+- `index.js` should end with a default `export` statement representing the whole library.
 
 
 ### Node.js build
 - External dependencies will be left untouched in the final built file thus making classic `require()` Node.js statements. *(See webpack configuration)*
-- The `export/node.js` file should look like this:
+- Final usage will look like this
 ```js
-export * from '..';
-```
-- Making its final usage look like
-```js
-const { mylibrary } = require('@organisation/my-library');   // dist/node.js
+const mylibrary = require('@organisation/my-library');   // dist/node.js
 ```
 
 
-### Browser build
+### kafe build
 - External dependencies will be transform to a variable assignation, assuming that the dependencies are already loaded elsewhere. *(See webpack configuration)*
 ```js
 const cl = require('cool-lib');
 // Becomes
-const cl = coolLib;
+const cl = window.coolLib;
 ```
-- The `export/browser.js` file should look like this:
+- Final usage will look like this
 ```js
-import { mylibrary } from '..';
-window.mylibrary = mylibrary;
+console.log(window.kafe.mylibrary);
 ```
-- Making its final usage look like
-```js
-console.log(window.mylibrary);
-```
-- The `dist/browser.js` is a pure ES6+ built and the `dist/browser-es5.js` is the same but with a Babel compilation to ES5 syntax.
+- The `dist/kafe.js` is a pure ES6+ built and the `dist/kafe-es5.js` is the same but with a Babel compilation to ES5 syntax.
 
 
 ### webpack Configuration
 Your `webpack.config.js` should look like this
 ```js
 const merge          = require('lodash.merge');
-const libraryBuilder = require('@absolunet/library-builder');
+const LibraryBuilder = require('@absolunet/library-builder');
 
-libraryBuilder.setRoot(__dirname);
+const builder = new LibraryBuilder({
+	name: 'mylibrary',
+	root: __dirname
+});
 
 
 //-- Node.js
-const nodeConfig = merge({}, libraryBuilder.config.node, {
+const nodeConfig = merge({}, builder.config.node, {
 	externals: [
 		'cool-lib',          // Dependencies to reference and not include
 		'meaningful-helper'
@@ -98,19 +88,19 @@ const nodeConfig = merge({}, libraryBuilder.config.node, {
 });
 
 
-//-- Browser
-const browserExternals = {
+//-- kafe
+const kafeExternals = {
 	externals: {
-		'cool-lib':           'coolLib',   // Dependencies to reference and their variable counterpart
-		'meaningful-helper':  'mnfHelper'
+		'cool-lib':           'window.coolLib',   // Dependencies to reference and their variable counterpart
+		'meaningful-helper':  'window.mnfHelper'
 	}
 };
 
-const browserConfig    = merge({}, libraryBuilder.config.browser,    browserExternals);
-const browserES5Config = merge({}, libraryBuilder.config.browserES5, browserExternals);
+const kafeConfig    = merge({}, builder.config.kafe,    kafeExternals);
+const kafeES5Config = merge({}, builder.config.kafeES5, kafeExternals);
 
 
-module.exports = [nodeConfig, browserConfig, browserES5Config];
+module.exports = [nodeConfig, kafeConfig, kafeES5Config];
 ```
 
 
@@ -119,12 +109,12 @@ Your `package.json` should contain these entries
 ```json
 {
 	"main": "dist/node.js",
-	"browser": "dist/browser.js",
+	"browser": "dist/kafe.js",
 	"scripts": {
 		"build": "node node_modules/@absolunet/library-builder/bin/build.js"
 	},
 	"devDependencies": {
-		"@absolunet/library-builder": "0.0.1",
+		"@absolunet/library-builder": "1.1.0",
 		"lodash.merge": "4.6.1"
 	},
 	"dependencies": {
@@ -143,39 +133,43 @@ This way to build you only need to run `npm run build`
 
 ## API
 
-### `setRoot(path)`
-Set the root path of your project
+### constructor(options)
 
-#### path
-Type: `string`<br>
+#### options.name
+*Required*<br>
+Type: `String`<br>
+Package name (for kafe build)
+
+#### options.root
+*Required*<br>
+Type: `String`<br>
 Path to root folder  *(typically `__dirname`)*
+
+
+
+
 
 
 <br>
 
-
-
-
 ## API - Configuration
 
-### `config.node`
+### config.node
 Base webpack config for Node.js export
 
 
 
+<br>
+
+### config.kafe
+Base webpack config for kafe ES6+ export
+
+
 
 <br>
 
-### `config.browser`
-Base webpack config for browser ES6+ export
-
-
-
-
-<br>
-
-### `config.browserES5`
-Base webpack config for browser ES5 export (via Babel)
+### config.kafeES5
+Base webpack config for kafe ES5 export (via Babel)
 
 
 

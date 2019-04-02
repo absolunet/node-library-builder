@@ -3,117 +3,41 @@
 //--------------------------------------------------------
 'use strict';
 
-const merge = require('lodash.merge');
-const path  = require('path');
+const ow   = require('ow');
+const path = require('path');
+const fss  = require('@absolunet/fss');
+const __   = require('@absolunet/private-registry');
 
-
-const paths = {};
-
-const mergeDist = (config) => {
-	return merge({}, config, {
-		output: {
-			path: paths.dist
-		}
-	});
-};
+const LibraryBuilderConfig = require('./lib/config');
 
 
 
 
 
 
-//-- Common
-const commonConfig = {
-	mode:    'none',
-	devtool: ''
-};
+class LibraryBuilder {
 
+	constructor({ name, root }) {
+		ow(name, ow.string.nonEmpty);
+		ow(root, ow.string.nonEmpty);
 
-//-- Node.js
-const nodeConfig = merge({}, commonConfig, {
-	target: 'node',
-	entry:  './export/node.js',
-	output: {
-		filename:      'node.js',
-		libraryTarget: 'commonjs2'
-	}
-});
+		const DIST = path.resolve(root, 'dist');
 
+		__(this).set('config', new LibraryBuilderConfig({
+			name: name,
+			root: root,
+			dist: DIST
+		}));
 
-//-- Browser
-const browserConfig = merge({}, commonConfig, {
-	target: 'web',
-	entry:  './export/browser.js',
-	output: {
-		filename: 'browser.js'
-	}
-});
-
-
-//-- Browser ES5
-const browserES5Config = merge({}, browserConfig, {
-	output: {
-		filename: 'browser-es5.js'
-	},
-	module: {
-		rules: [
-			{
-				test: /\.js$/u,
-				exclude: /node_modules/u,
-				use: {
-					loader: 'babel-loader',
-					options: {
-						presets: ['env']
-					}
-				}
-			}
-		]
+		fss.removePattern(`${DIST}/*`);
 	}
 
-});
-
-
-
-
-
-
-//-- Config
-class BuilderConfig {
-
-	get node() {
-		return mergeDist(nodeConfig);
-	}
-
-	get browser() {
-		return mergeDist(browserConfig);
-	}
-
-	get browserES5() {
-		return mergeDist(browserES5Config);
-	}
-
-}
-
-
-//-- Main
-const builderConfig = new BuilderConfig();
-
-class Builder {
-
-	setRoot(root) {
-		paths.root = root;
-		paths.dist = path.resolve(root, 'dist');
-	}
 
 	get config() {
-		return builderConfig;
+		return __(this).get('config');
 	}
 
 }
 
 
-
-
-
-
-module.exports = new Builder();
+module.exports = LibraryBuilder;
