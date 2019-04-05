@@ -8,7 +8,7 @@
 
 > JS library builder via webpack
 
-Write your JS library and export it for Node.js, [kafe](https://absolunet.github.io/kafe) (ES5/ES6+) via [webpack](https://webpack.js.org) and [Babel](https://babeljs.io/)
+Write your JS library and export it for Node.js, browser or [kafe](https://absolunet.github.io/kafe) (ES5/ES6+) via [webpack](https://webpack.js.org) and [Babel](https://babeljs.io/)
 
 
 ## Install
@@ -28,6 +28,8 @@ index.js
 webpack.config.js
 
 dist/
+	↳ browser.js
+	↳ browser-es5.js
 	↳ kafe.js
 	↳ kafe-es5.js
 	↳ node.js
@@ -53,7 +55,7 @@ const mylibrary = require('@organisation/my-library');   // dist/node.js
 ```
 
 
-### kafe build
+### Browser build
 - External dependencies will be transform to a variable assignation, assuming that the dependencies are already loaded elsewhere. *(See webpack configuration)*
 ```js
 const cl = require('cool-lib');
@@ -62,7 +64,16 @@ const cl = window.coolLib;
 ```
 - Final usage will look like this
 ```js
-console.log(window.kafe.mylibrary);
+console.log(window.mylibrary);   // dist/browser.js
+```
+- The `dist/browser.js` is a pure ES6+ built and the `dist/browser-es5.js` is the same but with a Babel compilation to ES5 syntax.
+
+
+### kafe build
+- Is the same as the browser build but with the output scoped under `window.kafe`
+- Final usage will look like this
+```js
+console.log(window.kafe.mylibrary);   // dist/kafe.js
 ```
 - The `dist/kafe.js` is a pure ES6+ built and the `dist/kafe-es5.js` is the same but with a Babel compilation to ES5 syntax.
 
@@ -87,8 +98,8 @@ const nodeExternals = {
 };
 
 
-//-- kafe
-const kafeExternals = {
+//-- Browser
+const browserExternals = {
 	externals: {
 		'cool-lib':           'window.coolLib',   // Dependencies to reference and their variable counterpart
 		'meaningful-helper':  'window.mnfHelper'
@@ -97,9 +108,11 @@ const kafeExternals = {
 
 
 module.exports = [
-	builder.config.mergeWithNode(nodeExternals),
-	builder.config.mergeWithKafe(kafeExternals),
-	builder.config.mergeWithKafeES5(kafeExternals)
+	builder.config.mergeWithNode(nodeExternals),           // If you want a Node.js build
+	builder.config.mergeWithBrowser(browserExternals),     // If you want a browser ES6+ build
+	builder.config.mergeWithBrowserES5(browserExternals),  // If you want a browser ES5 build
+	builder.config.mergeWithKafe(browserExternals),        // If you want a kafe ES6+ build
+	builder.config.mergeWithKafeES5(browserExternals)      // If you want a kafe ES5 build
 ];
 ```
 
@@ -109,7 +122,7 @@ Your `package.json` should contain these entries
 ```json
 {
 	"main": "dist/node.js",
-	"browser": "dist/kafe.js",
+	"browser": "dist/browser.js -OR- dist/kafe.js",
 	"scripts": {
 		"build": "node node_modules/@absolunet/library-builder/bin/build.js"
 	},
@@ -161,6 +174,20 @@ Base webpack configuration for Node.js export
 
 <br>
 
+### config.browser
+Base webpack configuration for browser ES6+ export
+
+
+
+<br>
+
+### config.browserES5
+Base webpack configuration for browser ES5 export (via Babel)
+
+
+
+<br>
+
 ### config.kafe
 Base webpack configuration for kafe ES6+ export
 
@@ -183,6 +210,32 @@ Add custom configuration to base configuration
 *Required*<br>
 Type: `Object`<br>
 webpack configuration to merge with Node.js configuration
+
+
+
+<br>
+
+### config.mergeWithBrowser(config)
+Returns `Object` webpack configuration<br>
+Add custom configuration to base configuration
+
+#### config
+*Required*<br>
+Type: `Object`<br>
+webpack configuration to merge with browser ES6+ configuration
+
+
+
+<br>
+
+### config.mergeWithBrowserES5(config)
+Returns `Object` webpack configuration<br>
+Add custom configuration to base configuration
+
+#### config
+*Required*<br>
+Type: `Object`<br>
+webpack configuration to merge with browser ES5 configuration
 
 
 

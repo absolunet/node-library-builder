@@ -1,6 +1,6 @@
 {
   "name": "@absolunet/library-builder",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "JS library builder via webpack",
   "definition": "",
   "homepage": "https://github.com/absolunet/node-library-builder",

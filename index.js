@@ -21,15 +21,15 @@ class LibraryBuilder {
 		ow(name, ow.string.nonEmpty);
 		ow(root, ow.string.nonEmpty);
 
-		const DIST = path.resolve(root, 'dist');
+		const dist = path.resolve(root, 'dist');
 
 		__(this).set('config', new LibraryBuilderConfig({
 			name: name,
 			root: root,
-			dist: DIST
+			dist: dist
 		}));
 
-		fss.removePattern(`${DIST}/*`);
+		fss.removePattern(`${dist}/*`);
 	}
 
 
